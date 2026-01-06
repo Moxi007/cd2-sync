@@ -1,10 +1,10 @@
 services:
   cd2-monitor:
-    build: .
+    image: lfy1680/cd2-monitor:latest
     container_name: cd2-monitor
     restart: unless-stopped
-    ports:
-      - "5000:5000"
+    # ports:
+    #   - "5000:5000"
     environment:
       - CD2_HOST=192.168.1.100:19798  # 修改为你的 CD2 地址
       - CD2_USER=your_email@example.com
@@ -14,4 +14,4 @@ services:
       - DEBOUNCE_DELAY=5.0
       # - PATH_MAPPING='{"/source":"/dest"}'
     # 如果 CD2 在同一 Docker 网络中，可以使用 network_mode
-    # network_mode: host
+    network_mode: host
