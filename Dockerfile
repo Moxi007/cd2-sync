@@ -3,7 +3,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # 创建日志目录
-RUN mkdir -p /app/logs
+RUN mkdir -p /app/log
 
 # 安装依赖
 COPY requirements.txt .
@@ -22,10 +22,10 @@ ENV CD2_PASS=""
 ENV PORT=5000
 ENV SECURITY_TOKEN="fjwejaovnpavSe"
 ENV DEBOUNCE_DELAY=5.0
-ENV LOG_FILE="/app/logs/monitor.log"
+ENV LOG_FILE="/app/log/monitor.log"
 
 # 声明日志卷，方便持久化
-VOLUME ["/app/logs"]
+VOLUME ["/app/log"]
 
 EXPOSE 5000
 
