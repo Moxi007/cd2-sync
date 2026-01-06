@@ -13,26 +13,26 @@ import clouddrive_pb2
 import clouddrive_pb2_grpc
 
 # ==================== 核心配置区域 ====================
-# B机器 CD2 地址
-CD2_HOST = "localhost:19798"
-CD2_USER = "qaz199349@gmail.com"
-CD2_PASS = "jtk2JZR5zuj.pjz_kpa"
+# 支持环境变量配置 (Docker 友好)
+CD2_HOST = os.environ.get("CD2_HOST", "localhost:19798")
+CD2_USER = os.environ.get("CD2_USER", "")
+CD2_PASS = os.environ.get("CD2_PASS", "")
 
-# 路径映射
-PATH_MAPPING = {
-    "/": "/", 
-}
+# 路径映射 (支持 JSON 格式环境变量，如: '{"/"："/"}'）
+PATH_MAPPING_STR = os.environ.get("PATH_MAPPING", '{"/"："/"}')
+try:
+    PATH_MAPPING = json.loads(PATH_MAPPING_STR.replace("：", ":"))
+except:
+    PATH_MAPPING = {"/": "/"}
 
 # 监听端口
-PORT = 5000
+PORT = int(os.environ.get("PORT", "5000"))
 
 # [优化1] 安全Token
-# 建议在 A 机器 webhook.toml 的 [file_system_watcher.headers] 下添加 token = "fjwejaovnpavSe"
-SECURITY_TOKEN = "fjwejaovnpavSe" 
+SECURITY_TOKEN = os.environ.get("SECURITY_TOKEN", "fjwejaovnpavSe")
 
 # [优化2] 防抖延迟 (秒)
-# 收到变动后等待多久再刷新，期间收到的变动会合并
-DEBOUNCE_DELAY = 5.0 
+DEBOUNCE_DELAY = float(os.environ.get("DEBOUNCE_DELAY", "5.0"))
 
 # [优化3] 忽略的文件后缀或名称 (小写)
 IGNORE_EXTENSIONS = {".tmp", ".temp", ".crdownload", ".part", ".ds_store", "thumbs.db", ".aria2"}

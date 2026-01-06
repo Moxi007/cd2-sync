@@ -1,0 +1,8 @@
+.git
+.gitignore
+*.log
+*.pyc
+__pycache__
+.vscode
+.kiro
+README.md
