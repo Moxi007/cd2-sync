@@ -12,6 +12,10 @@ services:
       - PORT=5000
       - SECURITY_TOKEN=fjwejaovnpavSe
       - DEBOUNCE_DELAY=5.0
+      - LOG_FILE=/app/logs/monitor.log
       # - PATH_MAPPING='{"/source":"/dest"}'
+    volumes:
+      # 日志持久化到宿主机
+      - ./log:/app/log
     # 如果 CD2 在同一 Docker 网络中，可以使用 network_mode
     network_mode: host

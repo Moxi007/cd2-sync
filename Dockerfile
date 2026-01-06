@@ -2,6 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# 创建日志目录
+RUN mkdir -p /app/logs
+
 # 安装依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -19,7 +22,12 @@ ENV CD2_PASS=""
 ENV PORT=5000
 ENV SECURITY_TOKEN="fjwejaovnpavSe"
 ENV DEBOUNCE_DELAY=5.0
+ENV LOG_FILE="/app/logs/monitor.log"
+
+# 声明日志卷，方便持久化
+VOLUME ["/app/logs"]
 
 EXPOSE 5000
 
-CMD ["python", "-u", "monitor_cd2_grpc.py"]
+# 同时输出到控制台和日志文件
+CMD ["sh", "-c", "python -u monitor_cd2_grpc.py 2>&1 | tee -a ${LOG_FILE}"]
