@@ -6,16 +6,19 @@ services:
     # ports:
     #   - "5000:5000"
     environment:
-      - CD2_HOST=192.168.1.100:19798  # 修改为你的 CD2 地址
-      - CD2_USER=your_email@example.com
-      - CD2_PASS=your_password
+      - CD2_HOST=127.0.0.1:19798   # 修改为你的 CD2 地址
+      - CD2_TOKEN=                 # 优先使用 token 认证（推荐）
+      - CD2_USER=                  # 或使用用户名密码
+      - CD2_PASS=
       - PORT=5000
       - SECURITY_TOKEN=fjwejaovnpavSe
-      - DEBOUNCE_DELAY=5.0
-      - LOG_FILE=/app/log/monitor.log
+      - DEBOUNCE_DELAY=5           # 防抖延迟（秒）
+      - GRPC_RETRY_TIMES=5         # gRPC 连接重试次数
+      - GRPC_RETRY_INTERVAL=10     # gRPC 重试间隔（秒）
+      - REFRESH_CONCURRENCY=3      # 并发刷新数
+      - TZ=Asia/Shanghai
       # - PATH_MAPPING='{"/source":"/dest"}'
     volumes:
-      # 日志持久化到宿主机
       - ./log:/app/log
     # 如果 CD2 在同一 Docker 网络中，可以使用 network_mode
     network_mode: host
