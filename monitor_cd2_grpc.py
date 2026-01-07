@@ -39,6 +39,8 @@ DEBOUNCE_DELAY = float(os.environ.get("DEBOUNCE_DELAY", "5.0"))
 GRPC_RETRY_TIMES = int(os.environ.get("GRPC_RETRY_TIMES", "5"))
 GRPC_RETRY_INTERVAL = int(os.environ.get("GRPC_RETRY_INTERVAL", "10"))
 REFRESH_CONCURRENCY = int(os.environ.get("REFRESH_CONCURRENCY", "3"))  # 并发刷新数
+REFRESH_RETRY_TIMES = int(os.environ.get("REFRESH_RETRY_TIMES", "3"))  # 刷新失败重试次数
+REFRESH_RETRY_INTERVAL = int(os.environ.get("REFRESH_RETRY_INTERVAL", "10"))  # 刷新重试间隔（秒）
 IGNORE_EXTENSIONS = {".tmp", ".temp", ".crdownload", ".part", ".ds_store", "thumbs.db", ".aria2"}
 
 # 忽略的目录列表，支持前缀匹配
@@ -237,8 +239,8 @@ class CD2Client:
         except:
             return False
 
-    def refresh_path_now(self, path, retry_on_auth=True):
-        """立即执行刷新"""
+    def refresh_path_now(self, path, retry_on_auth=True, retry_count=0):
+        """立即执行刷新，支持网络错误重试"""
         if not self.ensure_token():
             stats.inc_failed()
             return
@@ -260,18 +262,46 @@ class CD2Client:
                 self.token = None
                 if self.ensure_token():
                     # 只重试一次，避免无限递归
-                    self.refresh_path_now(path, retry_on_auth=False)
+                    self.refresh_path_now(path, retry_on_auth=False, retry_count=retry_count)
                 else:
                     stats.inc_failed()
             elif "not found" in error_detail.lower():
                 log(f"[gRPC] 忽略: 目录已不存在: {path}")
                 stats.inc_ignored()
+            elif self._is_retryable_error(e, error_detail) and retry_count < REFRESH_RETRY_TIMES:
+                # 网络错误或超时，进行重试
+                retry_count += 1
+                log(f"[gRPC] × 请求失败，{REFRESH_RETRY_INTERVAL}秒后重试 ({retry_count}/{REFRESH_RETRY_TIMES}): {error_detail[:100]}")
+                time.sleep(REFRESH_RETRY_INTERVAL)
+                self.refresh_path_now(path, retry_on_auth=retry_on_auth, retry_count=retry_count)
             else:
                 log(f"[gRPC] × 失败: {error_detail}")
                 stats.inc_failed()
         except Exception as e:
-            log(f"[gRPC] × 未知错误: {e}")
-            stats.inc_failed()
+            error_msg = str(e)
+            if retry_count < REFRESH_RETRY_TIMES:
+                retry_count += 1
+                log(f"[gRPC] × 未知错误，{REFRESH_RETRY_INTERVAL}秒后重试 ({retry_count}/{REFRESH_RETRY_TIMES}): {error_msg[:100]}")
+                time.sleep(REFRESH_RETRY_INTERVAL)
+                self.refresh_path_now(path, retry_on_auth=retry_on_auth, retry_count=retry_count)
+            else:
+                log(f"[gRPC] × 未知错误: {error_msg}")
+                stats.inc_failed()
+
+    def _is_retryable_error(self, error, detail):
+        """判断是否为可重试的错误（网络问题、超时等）"""
+        retryable_codes = {
+            grpc.StatusCode.UNAVAILABLE,
+            grpc.StatusCode.DEADLINE_EXCEEDED,
+            grpc.StatusCode.RESOURCE_EXHAUSTED,
+            grpc.StatusCode.ABORTED,
+        }
+        if error.code() in retryable_codes:
+            return True
+        # 检查错误信息中的网络相关关键词
+        network_keywords = ["timeout", "connection", "network", "request", "sending request"]
+        detail_lower = detail.lower()
+        return any(kw in detail_lower for kw in network_keywords)
 
 
 # 全局实例

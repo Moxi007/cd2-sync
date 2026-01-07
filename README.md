@@ -69,6 +69,8 @@ docker-compose up -d
 | `REFRESH_CONCURRENCY` | 并发刷新数 | `3` |
 | `PATH_MAPPING` | 路径映射（JSON 格式） | `{"/":"/"}` |
 | `IGNORE_PATHS` | 忽略的目录列表（逗号分隔） | - |
+| `REFRESH_RETRY_TIMES` | 刷新失败重试次数 | `3` |
+| `REFRESH_RETRY_INTERVAL` | 刷新重试间隔秒数 | `10` |
 
 ## API 接口
 

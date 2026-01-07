@@ -15,7 +15,8 @@ services:
       - DEBOUNCE_DELAY=5           # 防抖延迟（秒）
       - GRPC_RETRY_TIMES=5         # gRPC 连接重试次数
       - GRPC_RETRY_INTERVAL=10     # gRPC 重试间隔（秒）
-      - REFRESH_CONCURRENCY=3      # 并发刷新数
+      - REFRESH_CONCURRENCY=2      # 并发刷新数
+      - IGNORE_PATHS=/115_c/temp   # 忽略路径（多个用英文逗号分隔）
       - TZ=Asia/Shanghai
       # - PATH_MAPPING='{"/source":"/dest"}'
     volumes:
