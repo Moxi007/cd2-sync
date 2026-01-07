@@ -25,17 +25,24 @@ services:
     image: lfy1680/cd2-sync:latest
     container_name: cd2-sync
     restart: unless-stopped
+    # ports:
+    #   - "5000:5000"
     environment:
-      - CD2_HOST=127.0.0.1:19798      # CD2 gRPC 地址
-      - CD2_TOKEN=                     # Token 认证（推荐）
-      - CD2_USER=                      # 或使用用户名
-      - CD2_PASS=                      # 和密码
+      - CD2_HOST=127.0.0.1:19798   # 修改为你的 CD2 地址
+      - CD2_TOKEN=                 # 优先使用 token 认证（推荐）
+      - CD2_USER=                  # 或使用用户名密码
+      - CD2_PASS=
       - PORT=5000
-      - SECURITY_TOKEN=your_token      # webhook 安全令牌
-      - DEBOUNCE_DELAY=5               # 防抖延迟（秒）
+      - SECURITY_TOKEN=fjwejaovnpavSe
+      - DEBOUNCE_DELAY=5           # 防抖延迟（秒）
+      - GRPC_RETRY_TIMES=5         # gRPC 连接重试次数
+      - GRPC_RETRY_INTERVAL=10     # gRPC 重试间隔（秒）
+      - REFRESH_CONCURRENCY=3      # 并发刷新数
       - TZ=Asia/Shanghai
+      # - PATH_MAPPING='{"/source":"/dest"}'
     volumes:
       - ./log:/app/log
+    # 如果 CD2 在同一 Docker 网络中，可以使用 network_mode
     network_mode: host
 ```
 
@@ -55,7 +62,7 @@ docker-compose up -d
 | `CD2_PASS` | CD2 密码 | - |
 | `PORT` | 服务监听端口 | `5000` |
 | `SECURITY_TOKEN` | webhook 请求验证令牌 | `fjwejaovnpavSe` |
-| `DEBOUNCE_DELAY` | 防抖延迟秒数 | `5.0` |
+| `DEBOUNCE_DELAY` | 防抖延迟秒数 | `5` |
 | `GRPC_RETRY_TIMES` | gRPC 连接重试次数 | `5` |
 | `GRPC_RETRY_INTERVAL` | gRPC 重试间隔秒数 | `10` |
 | `REFRESH_CONCURRENCY` | 并发刷新数 | `3` |
