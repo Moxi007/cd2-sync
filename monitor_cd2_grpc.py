@@ -40,6 +40,10 @@ GRPC_RETRY_TIMES = int(os.environ.get("GRPC_RETRY_TIMES", "5"))
 GRPC_RETRY_INTERVAL = int(os.environ.get("GRPC_RETRY_INTERVAL", "10"))
 REFRESH_CONCURRENCY = int(os.environ.get("REFRESH_CONCURRENCY", "3"))  # 并发刷新数
 IGNORE_EXTENSIONS = {".tmp", ".temp", ".crdownload", ".part", ".ds_store", "thumbs.db", ".aria2"}
+
+# 忽略的目录列表，支持前缀匹配
+IGNORE_PATHS_STR = os.environ.get("IGNORE_PATHS", "")
+IGNORE_PATHS = [p.strip() for p in IGNORE_PATHS_STR.split(",") if p.strip()]
 # ====================================================
 
 sys.stdout.reconfigure(line_buffering=True)
@@ -369,9 +373,14 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
                 refresh_manager.schedule_refresh(path)
 
     def should_ignore(self, path):
-        """检查文件是否应被忽略（临时文件、下载中文件等）"""
-        filename = os.path.basename(path).lower()
+        """检查文件是否应被忽略（临时文件、下载中文件、忽略目录等）"""
+        # 检查是否在忽略目录中
+        for ignore_path in IGNORE_PATHS:
+            if path.startswith(ignore_path):
+                return True
         
+        # 检查文件扩展名
+        filename = os.path.basename(path).lower()
         for ext in IGNORE_EXTENSIONS:
             if filename.endswith(ext) or filename == ext:
                 return True

@@ -38,6 +38,7 @@ services:
       - GRPC_RETRY_TIMES=5         # gRPC 连接重试次数
       - GRPC_RETRY_INTERVAL=10     # gRPC 重试间隔（秒）
       - REFRESH_CONCURRENCY=3      # 并发刷新数
+      - IGNORE_PATHS=              # 忽略的目录（逗号分隔）
       - TZ=Asia/Shanghai
       # - PATH_MAPPING='{"/source":"/dest"}'
     volumes:
@@ -67,6 +68,7 @@ docker-compose up -d
 | `GRPC_RETRY_INTERVAL` | gRPC 重试间隔秒数 | `10` |
 | `REFRESH_CONCURRENCY` | 并发刷新数 | `3` |
 | `PATH_MAPPING` | 路径映射（JSON 格式） | `{"/":"/"}` |
+| `IGNORE_PATHS` | 忽略的目录列表（逗号分隔） | - |
 
 ## API 接口
 
