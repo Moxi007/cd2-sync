@@ -27,7 +27,7 @@ ENV SECURITY_TOKEN="fjwejaovnpavSe"
 ENV DEBOUNCE_DELAY=5.0
 ENV GRPC_RETRY_TIMES=5
 ENV GRPC_RETRY_INTERVAL=10
-ENV LOG_FILE="/app/log/monitor.log"
+ENV LOG_FILE="/app/log/cd2-sync.log"
 
 # 声明日志卷
 VOLUME ["/app/log"]
