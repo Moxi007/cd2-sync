@@ -431,6 +431,8 @@ def main():
     log(f"[接口] 统计信息: GET /stats")
     log(f"[接口] 刷新触发: POST /refresh")
     
+    # 允许端口复用，避免重启时 "Address already in use" 错误
+    socketserver.TCPServer.allow_reuse_address = True
     server = socketserver.TCPServer(("", PORT), WebhookHandler)
     server.serve_forever()
 
