@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-CD2 智能刷新服务
+CD2-Sync 目录同步刷新服务
 接收文件变动 webhook，通过 gRPC 通知 CloudDrive2 刷新目录缓存
 支持防抖、过滤、容错、健康检查等特性
 """
@@ -423,7 +423,7 @@ def main():
     elif CD2_USER and CD2_PASS:
         cd2_client.login(CD2_USER, CD2_PASS)
     
-    log(f"=== CD2 智能刷新服务启动 ===")
+    log(f"=== CD2-Sync 目录同步服务启动 ===")
     log(f"[配置] CD2 地址: {CD2_HOST}")
     log(f"[配置] 监听端口: {PORT}")
     log(f"[配置] 防抖延迟: {DEBOUNCE_DELAY}秒")

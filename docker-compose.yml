@@ -1,7 +1,7 @@
 services:
-  cd2-monitor:
-    image: lfy1680/cd2-monitor:latest
-    container_name: cd2-monitor
+  cd2-sync:
+    image: lfy1680/cd2-sync:latest
+    container_name: cd2-sync
     restart: unless-stopped
     # ports:
     #   - "5000:5000"

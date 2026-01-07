@@ -1,4 +1,4 @@
-name: CD2 Monitor Docker Build
+name: CD2-Sync Docker Build
 
 on:
   # 自动触发：当推送 tag 时 (如 v1.0.0)
@@ -45,7 +45,7 @@ jobs:
         with:
           # ⚠️ 修改为你的 Docker Hub 用户名/镜像名
           images: |
-            lfy1680/cd2-monitor
+            lfy1680/cd2-sync
           tags: |
             type=raw,value=${{ steps.config.outputs.tag_name }}
             type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}

@@ -1,6 +1,6 @@
-# CD2 Monitor
+# CD2-Sync
 
-CloudDrive2 目录刷新服务，接收文件变动 webhook 通知，自动刷新 CD2 目录缓存。
+CloudDrive2 目录同步刷新服务，接收文件变动 webhook 通知，自动刷新 CD2 目录缓存。
 
 ## 功能特性
 
@@ -21,9 +21,9 @@ CloudDrive2 目录刷新服务，接收文件变动 webhook 通知，自动刷�
 
 ```yaml
 services:
-  cd2-monitor:
-    image: lfy1680/cd2-monitor:latest
-    container_name: cd2-monitor
+  cd2-sync:
+    image: lfy1680/cd2-sync:latest
+    container_name: cd2-sync
     restart: unless-stopped
     environment:
       - CD2_HOST=127.0.0.1:19798      # CD2 gRPC 地址
