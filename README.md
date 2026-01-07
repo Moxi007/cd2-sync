@@ -180,7 +180,7 @@ body = '''
 ### 配置说明
 
 1. 将 `url` 中的 `接收端IP` 替换为运行本服务的机器 IP
-2. `token` 需要与本服务的 `SECURITY_TOKEN` 环境变量保持一致
+2. `headers` 中的 `token` 需要与本服务的 `SECURITY_TOKEN` 环境变量保持一致
 3. 如果不需要监控挂载点变动，`mount_point_watcher.enabled` 设为 `false`
 
 ## 许可证
