@@ -20,6 +20,7 @@ import signal
 # 导入 gRPC 模块
 import clouddrive_pb2
 import clouddrive_pb2_grpc
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ==================== 核心配置区域 ====================
 CD2_HOST = os.environ.get("CD2_HOST", "localhost:19798")
@@ -141,12 +142,11 @@ class RefreshManager:
 
         log(f"[Batch] 缓冲结束，并发刷新 {len(paths_to_process)} 个目录...")
         
-        # 并发刷新
-        from concurrent.futures import ThreadPoolExecutor, as_completed
-        with ThreadPoolExecutor(max_workers=REFRESH_CONCURRENCY) as executor:
-            futures = {executor.submit(self.client.refresh_path_now, path): path for path in paths_to_process}
-            for future in as_completed(futures):
-                pass  # 结果已在 refresh_path_now 中处理
+        log(f"[Batch] 缓冲结束，将 {len(paths_to_process)} 个目录加入刷新队列...")
+        
+        # 使用全局线程池并发刷新
+        for path in paths_to_process:
+            global_executor.submit(self.client.refresh_path_now, path)
     
     def cancel(self):
         """取消待执行的刷新任务"""
@@ -176,7 +176,13 @@ class CD2Client:
                     msg += f" (第 {attempt + 1} 次尝试)"
                 log(msg)
                 
-                self.channel = grpc.insecure_channel(self.host)
+                options = [
+                    ('grpc.keepalive_time_ms', 30000),             # 每 30 秒发送心跳
+                    ('grpc.keepalive_timeout_ms', 10000),          # 心跳超时时间 10 秒
+                    ('grpc.keepalive_permit_without_calls', True), # 没有请求时也允许发送心跳
+                    ('grpc.http2.max_pings_without_data', 0),      # 允许发送心跳的次数不限
+                ]
+                self.channel = grpc.insecure_channel(self.host, options=options)
                 self.stub = clouddrive_pb2_grpc.CloudDriveFileSrvStub(self.channel)
                 grpc.channel_ready_future(self.channel).result(timeout=10)
                 self.connected = True
@@ -308,8 +314,11 @@ class CD2Client:
 cd2_client = CD2Client(CD2_HOST, CD2_TOKEN if CD2_TOKEN else None)
 refresh_manager = RefreshManager(cd2_client)
 server = None
+global_executor = ThreadPoolExecutor(max_workers=REFRESH_CONCURRENCY)
 
 class WebhookHandler(http.server.BaseHTTPRequestHandler):
+    timeout = 30  # 设置 30 秒读写超时，避免异常连接阻塞服务
+    
     def log_message(self, format, *args):
         return
 
@@ -444,6 +453,10 @@ def graceful_shutdown(signum, frame):
     
     log("[系统] 服务已停止")
 
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    daemon_threads = True
+    allow_reuse_address = True
+
 def main():
     global server
     
@@ -470,9 +483,8 @@ def main():
     log(f"[接口] 统计信息: GET /stats")
     log(f"[接口] 刷新触发: POST /refresh")
     
-    # 允许端口复用，避免重启时 "Address already in use" 错误
-    socketserver.TCPServer.allow_reuse_address = True
-    server = socketserver.TCPServer(("", PORT), WebhookHandler)
+    # 使用多线程和支持超时的服务器实例，可防止请求假死
+    server = ThreadedTCPServer(("", PORT), WebhookHandler)
     server.serve_forever()
 
 if __name__ == '__main__':
