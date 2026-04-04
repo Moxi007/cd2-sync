@@ -6,7 +6,7 @@ import warnings
 import clouddrive_pb2 as clouddrive__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
-GRPC_GENERATED_VERSION = '1.76.0'
+GRPC_GENERATED_VERSION = '1.80.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -290,6 +290,21 @@ class CloudDriveFileSrvStub(object):
                 request_serializer=clouddrive__pb2.SetDiskCacheEvictionStrategyRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
+        self.SetFolderDiskCache = channel.unary_unary(
+                '/clouddrive.CloudDriveFileSrv/SetFolderDiskCache',
+                request_serializer=clouddrive__pb2.SetFolderDiskCacheRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                _registered_method=True)
+        self.RemoveFolderDiskCache = channel.unary_unary(
+                '/clouddrive.CloudDriveFileSrv/RemoveFolderDiskCache',
+                request_serializer=clouddrive__pb2.FileRequest.SerializeToString,
+                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                _registered_method=True)
+        self.ListDiskCacheFolders = channel.unary_unary(
+                '/clouddrive.CloudDriveFileSrv/ListDiskCacheFolders',
+                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=clouddrive__pb2.ListDiskCacheFoldersReply.FromString,
+                _registered_method=True)
         self.GetRunningInfo = channel.unary_unary(
                 '/clouddrive.CloudDriveFileSrv/GetRunningInfo',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
@@ -359,6 +374,11 @@ class CloudDriveFileSrvStub(object):
                 '/clouddrive.CloudDriveFileSrv/LocalGetSubFiles',
                 request_serializer=clouddrive__pb2.LocalGetSubFilesRequest.SerializeToString,
                 response_deserializer=clouddrive__pb2.LocalGetSubFilesResult.FromString,
+                _registered_method=True)
+        self.LocalCreateFolder = channel.unary_unary(
+                '/clouddrive.CloudDriveFileSrv/LocalCreateFolder',
+                request_serializer=clouddrive__pb2.LocalCreateFolderRequest.SerializeToString,
+                response_deserializer=clouddrive__pb2.LocalCreateFolderResult.FromString,
                 _registered_method=True)
         self.GetAllTasksCount = channel.unary_unary(
                 '/clouddrive.CloudDriveFileSrv/GetAllTasksCount',
@@ -502,7 +522,7 @@ class CloudDriveFileSrvStub(object):
                 _registered_method=True)
         self.APILogin115OpenQRCode = channel.unary_stream(
                 '/clouddrive.CloudDriveFileSrv/APILogin115OpenQRCode',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                request_serializer=clouddrive__pb2.Login115OpenQRCodeRequest.SerializeToString,
                 response_deserializer=clouddrive__pb2.QRCodeScanMessage.FromString,
                 _registered_method=True)
         self.APILoginAliyundriveOAuth = channel.unary_unary(
@@ -557,12 +577,17 @@ class CloudDriveFileSrvStub(object):
                 _registered_method=True)
         self.APILogin189QRCode = channel.unary_stream(
                 '/clouddrive.CloudDriveFileSrv/APILogin189QRCode',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                request_serializer=clouddrive__pb2.Login189QRCodeRequest.SerializeToString,
                 response_deserializer=clouddrive__pb2.QRCodeScanMessage.FromString,
                 _registered_method=True)
         self.APILoginWebDav = channel.unary_unary(
                 '/clouddrive.CloudDriveFileSrv/APILoginWebDav',
                 request_serializer=clouddrive__pb2.LoginWebDavRequest.SerializeToString,
+                response_deserializer=clouddrive__pb2.APILoginResult.FromString,
+                _registered_method=True)
+        self.APILoginS3 = channel.unary_unary(
+                '/clouddrive.CloudDriveFileSrv/APILoginS3',
+                request_serializer=clouddrive__pb2.LoginS3Request.SerializeToString,
                 response_deserializer=clouddrive__pb2.APILoginResult.FromString,
                 _registered_method=True)
         self.APIAddLocalFolder = channel.unary_unary(
@@ -669,6 +694,11 @@ class CloudDriveFileSrvStub(object):
                 '/clouddrive.CloudDriveFileSrv/GetCloudDrive1UserData',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=clouddrive__pb2.StringResult.FromString,
+                _registered_method=True)
+        self.GetServiceCapabilities = channel.unary_unary(
+                '/clouddrive.CloudDriveFileSrv/GetServiceCapabilities',
+                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=clouddrive__pb2.ServiceCapabilities.FromString,
                 _registered_method=True)
         self.RestartService = channel.unary_unary(
                 '/clouddrive.CloudDriveFileSrv/RestartService',
@@ -1418,6 +1448,27 @@ class CloudDriveFileSrvServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SetFolderDiskCache(self, request, context):
+        """enable file buffer disk cache for a folder
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def RemoveFolderDiskCache(self, request, context):
+        """disable file buffer disk cache for a folder
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ListDiskCacheFolders(self, request, context):
+        """list all folders with disk cache enabled
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetRunningInfo(self, request, context):
         """get server stats, including cpu/mem/uptime
         """
@@ -1512,6 +1563,13 @@ class CloudDriveFileSrvServicer(object):
 
     def LocalGetSubFiles(self, request, context):
         """get subfiles of a local path, used for adding mountpoint from web ui
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def LocalCreateFolder(self, request, context):
+        """create a folder on the local filesystem
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -1804,6 +1862,13 @@ class CloudDriveFileSrvServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def APILoginS3(self, request, context):
+        """add Amazon S3 or S3-compatible storage
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def APIAddLocalFolder(self, request, context):
         """add local folder
         """
@@ -1949,6 +2014,13 @@ class CloudDriveFileSrvServicer(object):
 
     def GetCloudDrive1UserData(self, request, context):
         """get CloudDrive1's user data string
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetServiceCapabilities(self, request, context):
+        """get service capabilities (restart/update availability)
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -2751,6 +2823,21 @@ def add_CloudDriveFileSrvServicer_to_server(servicer, server):
                     request_deserializer=clouddrive__pb2.SetDiskCacheEvictionStrategyRequest.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
+            'SetFolderDiskCache': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetFolderDiskCache,
+                    request_deserializer=clouddrive__pb2.SetFolderDiskCacheRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            ),
+            'RemoveFolderDiskCache': grpc.unary_unary_rpc_method_handler(
+                    servicer.RemoveFolderDiskCache,
+                    request_deserializer=clouddrive__pb2.FileRequest.FromString,
+                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            ),
+            'ListDiskCacheFolders': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListDiskCacheFolders,
+                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    response_serializer=clouddrive__pb2.ListDiskCacheFoldersReply.SerializeToString,
+            ),
             'GetRunningInfo': grpc.unary_unary_rpc_method_handler(
                     servicer.GetRunningInfo,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
@@ -2820,6 +2907,11 @@ def add_CloudDriveFileSrvServicer_to_server(servicer, server):
                     servicer.LocalGetSubFiles,
                     request_deserializer=clouddrive__pb2.LocalGetSubFilesRequest.FromString,
                     response_serializer=clouddrive__pb2.LocalGetSubFilesResult.SerializeToString,
+            ),
+            'LocalCreateFolder': grpc.unary_unary_rpc_method_handler(
+                    servicer.LocalCreateFolder,
+                    request_deserializer=clouddrive__pb2.LocalCreateFolderRequest.FromString,
+                    response_serializer=clouddrive__pb2.LocalCreateFolderResult.SerializeToString,
             ),
             'GetAllTasksCount': grpc.unary_unary_rpc_method_handler(
                     servicer.GetAllTasksCount,
@@ -2963,7 +3055,7 @@ def add_CloudDriveFileSrvServicer_to_server(servicer, server):
             ),
             'APILogin115OpenQRCode': grpc.unary_stream_rpc_method_handler(
                     servicer.APILogin115OpenQRCode,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    request_deserializer=clouddrive__pb2.Login115OpenQRCodeRequest.FromString,
                     response_serializer=clouddrive__pb2.QRCodeScanMessage.SerializeToString,
             ),
             'APILoginAliyundriveOAuth': grpc.unary_unary_rpc_method_handler(
@@ -3018,12 +3110,17 @@ def add_CloudDriveFileSrvServicer_to_server(servicer, server):
             ),
             'APILogin189QRCode': grpc.unary_stream_rpc_method_handler(
                     servicer.APILogin189QRCode,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    request_deserializer=clouddrive__pb2.Login189QRCodeRequest.FromString,
                     response_serializer=clouddrive__pb2.QRCodeScanMessage.SerializeToString,
             ),
             'APILoginWebDav': grpc.unary_unary_rpc_method_handler(
                     servicer.APILoginWebDav,
                     request_deserializer=clouddrive__pb2.LoginWebDavRequest.FromString,
+                    response_serializer=clouddrive__pb2.APILoginResult.SerializeToString,
+            ),
+            'APILoginS3': grpc.unary_unary_rpc_method_handler(
+                    servicer.APILoginS3,
+                    request_deserializer=clouddrive__pb2.LoginS3Request.FromString,
                     response_serializer=clouddrive__pb2.APILoginResult.SerializeToString,
             ),
             'APIAddLocalFolder': grpc.unary_unary_rpc_method_handler(
@@ -3130,6 +3227,11 @@ def add_CloudDriveFileSrvServicer_to_server(servicer, server):
                     servicer.GetCloudDrive1UserData,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                     response_serializer=clouddrive__pb2.StringResult.SerializeToString,
+            ),
+            'GetServiceCapabilities': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetServiceCapabilities,
+                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    response_serializer=clouddrive__pb2.ServiceCapabilities.SerializeToString,
             ),
             'RestartService': grpc.unary_unary_rpc_method_handler(
                     servicer.RestartService,
@@ -4900,6 +5002,87 @@ class CloudDriveFileSrv(object):
             _registered_method=True)
 
     @staticmethod
+    def SetFolderDiskCache(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/clouddrive.CloudDriveFileSrv/SetFolderDiskCache',
+            clouddrive__pb2.SetFolderDiskCacheRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def RemoveFolderDiskCache(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/clouddrive.CloudDriveFileSrv/RemoveFolderDiskCache',
+            clouddrive__pb2.FileRequest.SerializeToString,
+            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ListDiskCacheFolders(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/clouddrive.CloudDriveFileSrv/ListDiskCacheFolders',
+            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            clouddrive__pb2.ListDiskCacheFoldersReply.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
     def GetRunningInfo(request,
             target,
             options=(),
@@ -5267,6 +5450,33 @@ class CloudDriveFileSrv(object):
             '/clouddrive.CloudDriveFileSrv/LocalGetSubFiles',
             clouddrive__pb2.LocalGetSubFilesRequest.SerializeToString,
             clouddrive__pb2.LocalGetSubFilesResult.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def LocalCreateFolder(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/clouddrive.CloudDriveFileSrv/LocalCreateFolder',
+            clouddrive__pb2.LocalCreateFolderRequest.SerializeToString,
+            clouddrive__pb2.LocalCreateFolderResult.FromString,
             options,
             channel_credentials,
             insecure,
@@ -6048,7 +6258,7 @@ class CloudDriveFileSrv(object):
             request,
             target,
             '/clouddrive.CloudDriveFileSrv/APILogin115OpenQRCode',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            clouddrive__pb2.Login115OpenQRCodeRequest.SerializeToString,
             clouddrive__pb2.QRCodeScanMessage.FromString,
             options,
             channel_credentials,
@@ -6345,7 +6555,7 @@ class CloudDriveFileSrv(object):
             request,
             target,
             '/clouddrive.CloudDriveFileSrv/APILogin189QRCode',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            clouddrive__pb2.Login189QRCodeRequest.SerializeToString,
             clouddrive__pb2.QRCodeScanMessage.FromString,
             options,
             channel_credentials,
@@ -6373,6 +6583,33 @@ class CloudDriveFileSrv(object):
             target,
             '/clouddrive.CloudDriveFileSrv/APILoginWebDav',
             clouddrive__pb2.LoginWebDavRequest.SerializeToString,
+            clouddrive__pb2.APILoginResult.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def APILoginS3(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/clouddrive.CloudDriveFileSrv/APILoginS3',
+            clouddrive__pb2.LoginS3Request.SerializeToString,
             clouddrive__pb2.APILoginResult.FromString,
             options,
             channel_credentials,
@@ -6941,6 +7178,33 @@ class CloudDriveFileSrv(object):
             '/clouddrive.CloudDriveFileSrv/GetCloudDrive1UserData',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             clouddrive__pb2.StringResult.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetServiceCapabilities(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/clouddrive.CloudDriveFileSrv/GetServiceCapabilities',
+            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            clouddrive__pb2.ServiceCapabilities.FromString,
             options,
             channel_credentials,
             insecure,

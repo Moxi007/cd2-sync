@@ -204,6 +204,12 @@ class CD2Client:
             self.connected = False
             log("[gRPC] 连接已关闭")
 
+    def reconnect(self, retry=False):
+        """重建 gRPC 连接"""
+        log("[gRPC] 正在重建连接...")
+        self.close()
+        return self.connect(retry=retry)
+
     def set_token(self, token):
         """直接设置 token"""
         self.token = token
@@ -245,43 +251,101 @@ class CD2Client:
         except:
             return False
 
-    def refresh_path_now(self, path, retry_on_auth=True, retry_count=0):
+    def _refresh_path_once(self, path):
+        metadata = [('authorization', f'Bearer {self.token}')]
+        request = clouddrive_pb2.ListSubFileRequest(path=path, forceRefresh=True)
+        response_iterator = self.stub.GetSubFiles(request, metadata=metadata, timeout=180)
+        for _ in response_iterator:
+            break
+
+    def _get_parent_path(self, path):
+        normalized_path = path.rstrip("/") or "/"
+        if normalized_path == "/":
+            return None
+        parent_path = os.path.dirname(normalized_path)
+        return parent_path or "/"
+
+    def refresh_path_now(self, path, retry_on_auth=True, retry_count=0, retry_after_reconnect=True, fallback_to_parent=True, original_path=None):
         """立即执行刷新，支持网络错误重试"""
         if not self.ensure_token():
             stats.inc_failed()
             return
 
+        original_path = original_path or path
+
         try:
-            metadata = [('authorization', f'Bearer {self.token}')]
-            request = clouddrive_pb2.ListSubFileRequest(path=path, forceRefresh=True)
-            response_iterator = self.stub.GetSubFiles(request, metadata=metadata, timeout=180)
-            for _ in response_iterator:
-                break 
-            log(f"[gRPC] √ 已发送指令: {path}")
+            self._refresh_path_once(path)
+            if path == original_path:
+                log(f"[gRPC] √ 已发送指令: {path}")
+            else:
+                log(f"[gRPC] √ 已回退刷新父目录: {path} (原始路径: {original_path})")
             stats.inc_success()
 
         except grpc.RpcError as e:
             error_detail = e.details() or ""
+            error_code = e.code()
             
-            if e.code() == grpc.StatusCode.UNAUTHENTICATED and retry_on_auth:
+            if error_code == grpc.StatusCode.UNAUTHENTICATED and retry_on_auth:
                 log("[gRPC] Token 过期或无效，尝试重新登录...")
                 self.token = None
                 if self.ensure_token():
                     # 只重试一次，避免无限递归
-                    self.refresh_path_now(path, retry_on_auth=False, retry_count=retry_count)
+                    self.refresh_path_now(
+                        path,
+                        retry_on_auth=False,
+                        retry_count=retry_count,
+                        retry_after_reconnect=retry_after_reconnect,
+                        fallback_to_parent=fallback_to_parent,
+                        original_path=original_path
+                    )
                 else:
                     stats.inc_failed()
             elif "not found" in error_detail.lower():
-                log(f"[gRPC] 忽略: 目录已不存在: {path}")
-                stats.inc_ignored()
+                log(f"[gRPC] 路径查询返回 not found: {path} (code={error_code.name}, detail={error_detail})")
+
+                if retry_after_reconnect:
+                    log(f"[gRPC] 尝试重建连接后重试: {path}")
+                    if self.reconnect(retry=False):
+                        self.refresh_path_now(
+                            path,
+                            retry_on_auth=retry_on_auth,
+                            retry_count=retry_count,
+                            retry_after_reconnect=False,
+                            fallback_to_parent=fallback_to_parent,
+                            original_path=original_path
+                        )
+                        return
+                    log(f"[gRPC] 重建连接失败，跳过同路径重试: {path}")
+
+                parent_path = self._get_parent_path(path)
+                if fallback_to_parent and parent_path and parent_path != path:
+                    log(f"[gRPC] 改为刷新父目录: {parent_path} (原始路径: {original_path})")
+                    self.refresh_path_now(
+                        parent_path,
+                        retry_on_auth=retry_on_auth,
+                        retry_count=retry_count,
+                        retry_after_reconnect=False,
+                        fallback_to_parent=False,
+                        original_path=original_path
+                    )
+                else:
+                    log(f"[gRPC] 忽略: 目录已不存在: {path} (code={error_code.name}, detail={error_detail})")
+                    stats.inc_ignored()
             elif self._is_retryable_error(e, error_detail) and retry_count < REFRESH_RETRY_TIMES:
                 # 网络错误或超时，进行重试
                 retry_count += 1
                 log(f"[gRPC] × 请求失败，{REFRESH_RETRY_INTERVAL}秒后重试 ({retry_count}/{REFRESH_RETRY_TIMES}): {error_detail[:100]}")
                 time.sleep(REFRESH_RETRY_INTERVAL)
-                self.refresh_path_now(path, retry_on_auth=retry_on_auth, retry_count=retry_count)
+                self.refresh_path_now(
+                    path,
+                    retry_on_auth=retry_on_auth,
+                    retry_count=retry_count,
+                    retry_after_reconnect=retry_after_reconnect,
+                    fallback_to_parent=fallback_to_parent,
+                    original_path=original_path
+                )
             else:
-                log(f"[gRPC] × 失败: {error_detail}")
+                log(f"[gRPC] × 失败: code={error_code.name}, detail={error_detail}")
                 stats.inc_failed()
         except Exception as e:
             error_msg = str(e)
@@ -289,7 +353,14 @@ class CD2Client:
                 retry_count += 1
                 log(f"[gRPC] × 未知错误，{REFRESH_RETRY_INTERVAL}秒后重试 ({retry_count}/{REFRESH_RETRY_TIMES}): {error_msg[:100]}")
                 time.sleep(REFRESH_RETRY_INTERVAL)
-                self.refresh_path_now(path, retry_on_auth=retry_on_auth, retry_count=retry_count)
+                self.refresh_path_now(
+                    path,
+                    retry_on_auth=retry_on_auth,
+                    retry_count=retry_count,
+                    retry_after_reconnect=retry_after_reconnect,
+                    fallback_to_parent=fallback_to_parent,
+                    original_path=original_path
+                )
             else:
                 log(f"[gRPC] × 未知错误: {error_msg}")
                 stats.inc_failed()
